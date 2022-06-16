@@ -200,7 +200,9 @@ const ProductList = (props) => {
         } else {
             // Get the attibute value as an array.
             let attributeValue = searchParamsCopy.refine[attributeId] || []
+            console.log('product-list-split-start')
             let values = Array.isArray(attributeValue) ? attributeValue : attributeValue.split('|')
+            console.log('product-list-split-start')
 
             // Either set the value, or filter the value out.
             if (!selected) {

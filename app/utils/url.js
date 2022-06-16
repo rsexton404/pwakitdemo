@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
-import {getLocaleByReference, getParamsFromPath, getUrlConfig} from './utils'
-import {getDefaultSite, getSites} from './site-utils'
-import {HOME_HREF, urlPartPositions} from '../constants'
+import { getAppOrigin } from 'pwa-kit-react-sdk/utils/url';
+import { getLocaleByReference, getParamsFromPath, getUrlConfig } from './utils';
+import { getDefaultSite, getSites } from './site-utils';
+import { HOME_HREF, urlPartPositions } from '../constants';
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -22,8 +22,8 @@ import {HOME_HREF, urlPartPositions} from '../constants'
  * @returns {string|*}
  */
 export const absoluteUrl = (path) => {
-    return new URL(path, getAppOrigin()).toString()
-}
+  return new URL(path, getAppOrigin()).toString();
+};
 
 /**
  * Modifies a given url by adding/updating query parameters.
@@ -43,30 +43,29 @@ export const absoluteUrl = (path) => {
  * // '/en-GB/product/25501032M?color=JJ2SKXX&size=9MD'
  */
 export const rebuildPathWithParams = (url, extraParams) => {
-    const [pathname, search] = url.split('?')
-    const params = new URLSearchParams(search)
+  console.log('url-split-1-of-3-start');
+  const [pathname, search] = url.split('?');
+  console.log('url-split-1-of-3-end');
+  const params = new URLSearchParams(search);
 
-    // Apply any extra params.
-    Object.keys(extraParams).forEach((key) => {
-        const value = extraParams[key]
+  // Apply any extra params.
+  Object.keys(extraParams).forEach((key) => {
+    const value = extraParams[key];
 
-        // 0 is a valid value as for a param
-        if (!value && value !== 0) {
-            params.delete(key)
-        } else {
-            params.set(key, value)
-        }
-    })
+    // 0 is a valid value as for a param
+    if (!value && value !== 0) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+  });
 
-    // Clean up any trailing `=` for params without values.
-    const paramStr = params
-        .toString()
-        .replace(/=&/g, '&')
-        .replace(/=$/, '')
+  // Clean up any trailing `=` for params without values.
+  const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '');
 
-    // Generate the newly updated url.
-    return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`
-}
+  // Generate the newly updated url.
+  return `${pathname}${Array.from(paramStr).length > 0 ? `?${paramStr}` : ''}`;
+};
 
 /**
  * Builds a list of modified Urls with the provided params key and values,
@@ -90,8 +89,15 @@ export const rebuildPathWithParams = (url, extraParams) => {
  * // Returns
  * // ['/womens/clothing?sort=price-high-to-low', '/womens/clothing?sort=price-low-to-high']
  */
-export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =>
-    values.map((value) => rebuildPathWithParams(url, {[key]: value, ...extraParams}))
+export const buildUrlSet = (
+  url = '',
+  key = '',
+  values = [],
+  extraParams = {}
+) =>
+  values.map((value) =>
+    rebuildPathWithParams(url, { [key]: value, ...extraParams })
+  );
 
 /**
  * Given a category and the current locale returns an href to the product list page.
@@ -99,7 +105,8 @@ export const buildUrlSet = (url = '', key = '', values = [], extraParams = {}) =
  * @param {Object} category
  * @returns {string}
  */
-export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.id}`)
+export const categoryUrlBuilder = (category) =>
+  encodeURI(`/category/${category.id}`);
 
 /**
  * Given a product and the current locale returns an href to the product detail page.
@@ -107,7 +114,8 @@ export const categoryUrlBuilder = (category) => encodeURI(`/category/${category.
  * @param {Object} product
  * @returns {string}
  */
-export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`)
+export const productUrlBuilder = (product) =>
+  encodeURI(`/product/${product.id}`);
 
 /**
  * Given a search term, contructs a search url.
@@ -115,7 +123,7 @@ export const productUrlBuilder = (product) => encodeURI(`/product/${product.id}`
  * @param {string} searchTerm
  * @returns {string}
  */
-export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
+export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`;
 
 /**
  * Returns a relative URL for a locale short code.
@@ -127,44 +135,51 @@ export const searchUrlBuilder = (searchTerm) => `/search?q=${searchTerm}`
  * @returns {String} url - The relative URL for the specific locale.
  */
 export const getPathWithLocale = (shortCode, opts = {}) => {
-    const location = opts.location ? opts.location : window.location
-    let {siteRef, localeRef} = getParamsFromPath(`${location.pathname}${location.search}`)
-    let {pathname, search} = location
+  const location = opts.location ? opts.location : window.location;
+  let { siteRef, localeRef } = getParamsFromPath(
+    `${location.pathname}${location.search}`
+  );
+  let { pathname, search } = location;
 
-    // sanitize the site from current url if existing
-    if (siteRef) {
-        pathname = pathname.replace(`/${siteRef}`, '')
-        search = search.replace(`site=${siteRef}`, '')
-    }
-    // sanitize the locale from current url if existing
-    if (localeRef) {
-        pathname = pathname.replace(`/${localeRef}`, '')
-        search = search.replace(`locale=${localeRef}`, '')
-    }
-    // remove ending any &
-    search = search.replace(/&$/, '')
+  // sanitize the site from current url if existing
+  if (siteRef) {
+    pathname = pathname.replace(`/${siteRef}`, '');
+    search = search.replace(`site=${siteRef}`, '');
+  }
+  // sanitize the locale from current url if existing
+  if (localeRef) {
+    pathname = pathname.replace(`/${localeRef}`, '');
+    search = search.replace(`locale=${localeRef}`, '');
+  }
+  // remove ending any &
+  search = search.replace(/&$/, '');
 
-    const defaultSite = getDefaultSite()
-    const isHomeRef = pathname === HOME_HREF
+  const defaultSite = getDefaultSite();
+  const isHomeRef = pathname === HOME_HREF;
 
-    const isDefaultLocaleOfDefaultSite = shortCode === defaultSite.l10n.defaultLocale
-    const isDefaultSite = siteRef === defaultSite.alias || siteRef === defaultSite.id
-    // rebuild the url with new locale,
-    const newUrl = buildPathWithUrlConfig(
-        `${pathname}${search}`,
-        {
-            // By default, as for home page, when the values of site and locale belongs to the default site,
-            // they will be not shown in the url just
-            site:
-                isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
-                    ? ''
-                    : siteRef || defaultSite.alias || defaultSite.id,
-            locale: isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef ? '' : shortCode
-        },
-        opts
-    )
-    return newUrl
-}
+  const isDefaultLocaleOfDefaultSite =
+    shortCode === defaultSite.l10n.defaultLocale;
+  const isDefaultSite =
+    siteRef === defaultSite.alias || siteRef === defaultSite.id;
+  // rebuild the url with new locale,
+  const newUrl = buildPathWithUrlConfig(
+    `${pathname}${search}`,
+    {
+      // By default, as for home page, when the values of site and locale belongs to the default site,
+      // they will be not shown in the url just
+      site:
+        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+          ? ''
+          : siteRef || defaultSite.alias || defaultSite.id,
+      locale:
+        isDefaultLocaleOfDefaultSite && isDefaultSite && isHomeRef
+          ? ''
+          : shortCode,
+    },
+    opts
+  );
+  return newUrl;
+};
 
 /**
  * Builds the Home page URL for a given locale and site.
@@ -178,18 +193,25 @@ export const getPathWithLocale = (shortCode, opts = {}) => {
  * @returns {string}
  */
 export const homeUrlBuilder = (homeHref, options = {}) => {
-    const {locale, site} = options
-    const defaultSite = getDefaultSite()
-    const isDefaultLocaleOfDefaultSite =
-        locale.alias === defaultSite.l10n.defaultLocale ||
-        locale.id === defaultSite.l10n.defaultLocale
-    const isDefaultSite = site.id === defaultSite.id || site.alias === defaultSite.alias
-    const updatedUrl = buildPathWithUrlConfig(homeHref, {
-        locale: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : locale.alias || locale.id,
-        site: isDefaultLocaleOfDefaultSite && isDefaultSite ? '' : site.alias || site.id
-    })
-    return encodeURI(updatedUrl)
-}
+  const { locale, site } = options;
+  const defaultSite = getDefaultSite();
+  const isDefaultLocaleOfDefaultSite =
+    locale.alias === defaultSite.l10n.defaultLocale ||
+    locale.id === defaultSite.l10n.defaultLocale;
+  const isDefaultSite =
+    site.id === defaultSite.id || site.alias === defaultSite.alias;
+  const updatedUrl = buildPathWithUrlConfig(homeHref, {
+    locale:
+      isDefaultLocaleOfDefaultSite && isDefaultSite
+        ? ''
+        : locale.alias || locale.id,
+    site:
+      isDefaultLocaleOfDefaultSite && isDefaultSite
+        ? ''
+        : site.alias || site.id,
+  });
+  return encodeURI(updatedUrl);
+};
 
 /*
  * Remove query params from a give url path based on a given list of keys
@@ -208,22 +230,21 @@ export const homeUrlBuilder = (homeHref, options = {}) => {
  * // '/en-GB/cart?abc=12'
  */
 export const removeQueryParamsFromPath = (path, keys) => {
-    const [pathname, search] = path.split('?')
-    const params = new URLSearchParams(search)
-    keys.forEach((key) => {
-        if (params.has(key)) {
-            params.delete(key)
-        }
-    })
+  console.log('url-split-2-of-3-start');
+  const [pathname, search] = path.split('?');
+  console.log('url-split-2-of-3-end');
+  const params = new URLSearchParams(search);
+  keys.forEach((key) => {
+    if (params.has(key)) {
+      params.delete(key);
+    }
+  });
 
-    // Clean up any trailing `=` for params without values.
-    const paramStr = params
-        .toString()
-        .replace(/=&/g, '&')
-        .replace(/=$/, '')
+  // Clean up any trailing `=` for params without values.
+  const paramStr = params.toString().replace(/=&/g, '&').replace(/=$/, '');
 
-    return `${pathname}${paramStr && '?'}${paramStr}`
-}
+  return `${pathname}${paramStr && '?'}${paramStr}`;
+};
 
 /**
  * Rebuild the path with locale/site values with a given url
@@ -259,63 +280,73 @@ export const removeQueryParamsFromPath = (path, keys) => {
  * => /global/women/dresses?locale=en-GB
  *
  */
-export const buildPathWithUrlConfig = (relativeUrl, configValues = {}, opts = {}) => {
-    const urlConfig = getUrlConfig()
-    const sites = getSites()
-    const defaultSite = getDefaultSite()
-    const site =
-        sites.find((site) => {
-            return site.alias === configValues['site'] || site.id === configValues['site']
-        }) || defaultSite
-    const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale)
-    const defaultLocaleRefs = [defaultLocale.alias, defaultLocale.id].filter(Boolean)
-    const {disallowParams = []} = opts
-    if (!Object.values(configValues).length) return relativeUrl
-    const [pathname, search] = relativeUrl.split('?')
+export const buildPathWithUrlConfig = (
+  relativeUrl,
+  configValues = {},
+  opts = {}
+) => {
+  const urlConfig = getUrlConfig();
+  const sites = getSites();
+  const defaultSite = getDefaultSite();
+  const site =
+    sites.find((site) => {
+      return (
+        site.alias === configValues['site'] || site.id === configValues['site']
+      );
+    }) || defaultSite;
+  const defaultLocale = getLocaleByReference(site, site.l10n.defaultLocale);
+  const defaultLocaleRefs = [defaultLocale.alias, defaultLocale.id].filter(
+    Boolean
+  );
+  const { disallowParams = [] } = opts;
+  if (!Object.values(configValues).length) return relativeUrl;
+  console.log('url-split-3-of-3-start');
+  const [pathname, search] = relativeUrl.split('?');
+  console.log('url-split-3-of-3-end');
 
-    const params = new URLSearchParams(search)
-    // Remove any disallowed params.
-    if (disallowParams.length) {
-        disallowParams.forEach((param) => {
-            params.delete(param)
-        })
+  const params = new URLSearchParams(search);
+  // Remove any disallowed params.
+  if (disallowParams.length) {
+    disallowParams.forEach((param) => {
+      params.delete(param);
+    });
+  }
+
+  const queryParams = { ...Object.fromEntries(params) };
+  let basePathSegments = [];
+
+  // get the default values for site and locale
+  const showDefaults = urlConfig.showDefaults;
+
+  const defaultSiteRefs = [defaultSite.id, defaultSite.alias];
+  const defaultValues = [...defaultSiteRefs, ...defaultLocaleRefs];
+
+  const options = ['site', 'locale'];
+  options.forEach((option) => {
+    const position = urlConfig[option] || urlPartPositions.NONE;
+    const val = configValues[option];
+    if (position === urlPartPositions.PATH) {
+      // if showDefaults is false, the default value will not be show in the url
+      if (!showDefaults && defaultValues.includes(val)) {
+        return;
+      }
+      basePathSegments.push(val);
+    } else if (position === urlPartPositions.QUERY_PARAM) {
+      // if showDefaults is false, the default value will not be show in the url
+      if (!showDefaults && defaultValues.includes(val)) {
+        return;
+      }
+      queryParams[option] = val;
     }
-
-    const queryParams = {...Object.fromEntries(params)}
-    let basePathSegments = []
-
-    // get the default values for site and locale
-    const showDefaults = urlConfig.showDefaults
-
-    const defaultSiteRefs = [defaultSite.id, defaultSite.alias]
-    const defaultValues = [...defaultSiteRefs, ...defaultLocaleRefs]
-
-    const options = ['site', 'locale']
-    options.forEach((option) => {
-        const position = urlConfig[option] || urlPartPositions.NONE
-        const val = configValues[option]
-        if (position === urlPartPositions.PATH) {
-            // if showDefaults is false, the default value will not be show in the url
-            if (!showDefaults && defaultValues.includes(val)) {
-                return
-            }
-            basePathSegments.push(val)
-        } else if (position === urlPartPositions.QUERY_PARAM) {
-            // if showDefaults is false, the default value will not be show in the url
-            if (!showDefaults && defaultValues.includes(val)) {
-                return
-            }
-            queryParams[option] = val
-        }
-    })
-    // filter out falsy (empty string, undefined, null, etc) values in the array
-    basePathSegments = basePathSegments.filter(Boolean)
-    let updatedPath = `${
-        basePathSegments.length ? `/${basePathSegments.join('/')}` : ''
-    }${pathname}`
-    // append the query param to pathname
-    if (Object.keys(queryParams).length) {
-        updatedPath = rebuildPathWithParams(updatedPath, queryParams)
-    }
-    return updatedPath
-}
+  });
+  // filter out falsy (empty string, undefined, null, etc) values in the array
+  basePathSegments = basePathSegments.filter(Boolean);
+  let updatedPath = `${
+    basePathSegments.length ? `/${basePathSegments.join('/')}` : ''
+  }${pathname}`;
+  // append the query param to pathname
+  if (Object.keys(queryParams).length) {
+    updatedPath = rebuildPathWithParams(updatedPath, queryParams);
+  }
+  return updatedPath;
+};

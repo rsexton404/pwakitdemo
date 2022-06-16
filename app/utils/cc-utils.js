@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon} from '../components/icons'
+import {
+  AmexIcon,
+  DiscoverIcon,
+  MastercardIcon,
+  VisaIcon,
+} from '../components/icons';
 
 /**
  * Formats a credit card number against given criteria
@@ -14,25 +19,30 @@ import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon} from '../components/ic
  * @param {number[]} opts.length - Max number lengths for output
  * @returns {string} Formatted card number for display
  */
-export const formatCreditCardNumber = (cardNumber = '', opts = {gaps: [], lengths: []}) => {
-    let trimmedNumber = cardNumber.replace(/[^0-9]/g, '')
-    let numberLength = trimmedNumber.length
+export const formatCreditCardNumber = (
+  cardNumber = '',
+  opts = { gaps: [], lengths: [] }
+) => {
+  let trimmedNumber = cardNumber.replace(/[^0-9]/g, '');
+  let numberLength = trimmedNumber.length;
 
-    if (numberLength === opts.lengths[0] + 1) {
-        trimmedNumber = trimmedNumber.substr(0, opts.lengths[0])
-        numberLength = trimmedNumber.length
+  if (numberLength === opts.lengths[0] + 1) {
+    trimmedNumber = trimmedNumber.substr(0, opts.lengths[0]);
+    numberLength = trimmedNumber.length;
+  }
+
+  console.log('cc-utils-split-1-of-2-start');
+  let numbers = trimmedNumber.split('');
+  console.log('cc-utils-split-1-of-2-end');
+
+  opts.gaps.forEach((gapIndex, idx) => {
+    if (numberLength > gapIndex) {
+      numbers.splice(gapIndex + idx, 0, ' ');
     }
+  });
 
-    let numbers = trimmedNumber.split('')
-
-    opts.gaps.forEach((gapIndex, idx) => {
-        if (numberLength > gapIndex) {
-            numbers.splice(gapIndex + idx, 0, ' ')
-        }
-    })
-
-    return numbers.join('')
-}
+  return numbers.join('');
+};
 
 /**
  * Returns the icon component for a given card type
@@ -40,26 +50,26 @@ export const formatCreditCardNumber = (cardNumber = '', opts = {gaps: [], length
  * @returns {Function|undefined} React component
  */
 export const getCreditCardIcon = (type) => {
-    if (!type) {
-        return undefined
-    }
-    return {
-        // Visa
-        visa: VisaIcon,
+  if (!type) {
+    return undefined;
+  }
+  return {
+    // Visa
+    visa: VisaIcon,
 
-        // MasterCard
-        mastercard: MastercardIcon,
-        'master card': MastercardIcon,
+    // MasterCard
+    mastercard: MastercardIcon,
+    'master card': MastercardIcon,
 
-        // American Express
-        'american express': AmexIcon,
-        'american-express': AmexIcon,
-        amex: AmexIcon,
+    // American Express
+    'american express': AmexIcon,
+    'american-express': AmexIcon,
+    amex: AmexIcon,
 
-        // Discover
-        discover: DiscoverIcon
-    }[type.toLowerCase()]
-}
+    // Discover
+    discover: DiscoverIcon,
+  }[type.toLowerCase()];
+};
 
 /**
  * Returns the card type string in the format the SDK expects.
@@ -67,40 +77,43 @@ export const getCreditCardIcon = (type) => {
  * @returns {string|undefined} - The card type in a format expected by the SDK
  */
 export const getPaymentInstrumentCardType = (type) => {
-    if (!type) {
-        return undefined
-    }
-    return {
-        visa: 'Visa',
-        mastercard: 'Master Card',
-        'american-express': 'Amex',
-        discover: 'Discover'
-    }[type]
-}
+  if (!type) {
+    return undefined;
+  }
+  return {
+    visa: 'Visa',
+    mastercard: 'Master Card',
+    'american-express': 'Amex',
+    discover: 'Discover',
+  }[type];
+};
 
 export const createCreditCardPaymentBodyFromForm = (paymentFormData) => {
-    // eslint-disable-next-line no-unused-vars
-    const {expiry, paymentInstrumentId, ...selectedPayment} = paymentFormData
+  // eslint-disable-next-line no-unused-vars
+  const { expiry, paymentInstrumentId, ...selectedPayment } = paymentFormData;
 
-    // The form gives us the expiration date as `MM/YY` - so we need to split it into
-    // month and year to submit them as individual fields.
-    const [expirationMonth, expirationYear] = expiry.split('/')
+  // The form gives us the expiration date as `MM/YY` - so we need to split it into
+  // month and year to submit them as individual fields.
 
-    return {
-        paymentMethodId: 'CREDIT_CARD',
-        paymentCard: {
-            ...selectedPayment,
-            number: selectedPayment.number.replace(/ /g, ''),
-            cardType: getPaymentInstrumentCardType(selectedPayment.cardType),
-            expirationMonth: parseInt(expirationMonth),
-            expirationYear: parseInt(`20${expirationYear}`),
+  console.log('cc-utils-split-2-of-2-start');
+  const [expirationMonth, expirationYear] = expiry.split('/');
+  console.log('cc-utils-split-2-of-2-end');
 
-            // TODO: These fields are required for saving the card to the customer's
-            // account. Im not sure what they are for or how to get them, so for now
-            // we're just passing some values to make it work. Need to investigate.
-            issueNumber: '',
-            validFromMonth: 1,
-            validFromYear: 2020
-        }
-    }
-}
+  return {
+    paymentMethodId: 'CREDIT_CARD',
+    paymentCard: {
+      ...selectedPayment,
+      number: selectedPayment.number.replace(/ /g, ''),
+      cardType: getPaymentInstrumentCardType(selectedPayment.cardType),
+      expirationMonth: parseInt(expirationMonth),
+      expirationYear: parseInt(`20${expirationYear}`),
+
+      // TODO: These fields are required for saving the card to the customer's
+      // account. Im not sure what they are for or how to get them, so for now
+      // we're just passing some values to make it work. Need to investigate.
+      issueNumber: '',
+      validFromMonth: 1,
+      validFromYear: 2020,
+    },
+  };
+};

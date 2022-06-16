@@ -58,7 +58,7 @@
     "whatwg-fetch": "1.0.0"
   },
   "scripts": {
-    "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
+    "analyze-build": "MOBIFY_ANALYZE=true npm run build",
     "build-translations": "npm run extract-default-translations && npm run compile-translations",
     "compile-translations": "formatjs compile-folder --ast app/translations app/translations/compiled",
     "compile-translations:pseudo": "formatjs compile --ast app/translations/en-US.json --out-file app/translations/compiled/en-XB.json --pseudo-locale en-XB",
@@ -69,11 +69,11 @@
     "build": "npm run build-translations && pwa-kit-dev build",
     "push": "npm run build && pwa-kit-dev push",
     "save-credentials": "pwa-kit-dev save-credentials",
-    "start": "cross-env NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
+    "start": "NODE_ICU_DATA=node_modules/full-icu pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
-    "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
+    "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && USE_PSEUDOLOCALE=true npm run start",
     "test": "pwa-kit-dev test",
-    "test:lighthouse": "cross-env NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
+    "test:lighthouse": "NODE_ENV=production lhci autorun --config=tests/lighthouserc.js",
     "test:max-file-size": "bundlesize"
   },
   "bundlesize": [
